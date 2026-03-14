@@ -10,8 +10,9 @@ services:
       - key: JWT_SECRET
         sync: false
 
-  - type: static_site
+  - type: web
     name: schoolmate-web
+    runtime: static
     rootDir: .
     buildCommand: |
       curl -fsSL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.32.8-stable.tar.xz -o flutter.tar.xz
@@ -20,4 +21,4 @@ services:
       flutter config --enable-web
       flutter pub get
       flutter build web --release
-    publishPath: build/web
+    staticPublishPath: build/web
