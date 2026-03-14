@@ -1,0 +1,13 @@
+.git
+.gitignore
+.vscode
+.idea
+.venv
+build
+ios/build
+macos/build
+android/build
+android/.gradle
+**/__pycache__
+**/*.pyc
+**/.DS_Store

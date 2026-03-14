@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: schoolmate-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: JWT_SECRET
+        sync: false
+
+  - type: static_site
+    name: schoolmate-web
+    rootDir: .
+    buildCommand: |
+      curl -fsSL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.32.8-stable.tar.xz -o flutter.tar.xz
+      tar -xf flutter.tar.xz
+      export PATH="$PWD/flutter/bin:$PATH"
+      flutter config --enable-web
+      flutter pub get
+      flutter build web --release
+    publishPath: build/web
