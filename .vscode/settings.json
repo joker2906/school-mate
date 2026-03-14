@@ -9,7 +9,9 @@
         "open": true,
         "pod": true,
         "plutil": true,
-        "lsof": true
+        "lsof": true,
+        "pgrep": true,
+        "true": true
     },
     "python-envs.defaultEnvManager": "ms-python.python:system"
 }
