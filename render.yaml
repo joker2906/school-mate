@@ -11,7 +11,7 @@ services:
         sync: false
 
   - type: web
-    name: schoolmate-web
+    name: school-mates
     runtime: static
     rootDir: .
     buildCommand: |
