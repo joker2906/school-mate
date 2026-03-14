@@ -13,8 +13,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:school_management_system/routes/app_pages.dart';
 import 'package:school_management_system/student/view/Subjects/SubjectsScreen.dart';
 import 'package:school_management_system/teacher/controllers/home_controller.dart';
+import 'package:school_management_system/teacher/view/Adjuncts/TeacherAdjuncts.dart';
+import 'package:school_management_system/teacher/view/Attendance/teacher_attendance_screen.dart';
+import 'package:school_management_system/teacher/view/TAnnouncements/TAnnouncementsScreen.dart';
 import 'package:school_management_system/teacher/view/TSubject/Subjects/SubjectScreen.dart';
 import 'package:school_management_system/teacher/view/TSubject/TSubjectsInfo.dart';
+import 'package:school_management_system/teacher/view/tasks/TeacherTasksPage.dart';
+import 'package:school_management_system/teacher/view/TSubject/enter_marks_screen.dart';
 import 'package:school_management_system/teacher/widgets/ConnectionStateMessages.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,6 +39,96 @@ var _controller = Get.put(TeacherHomeController());
 
 class HomeTeacher extends StatelessWidget {
   const HomeTeacher({Key? key}) : super(key: key);
+
+  Future<void> _openClassPicker(
+    BuildContext context, {
+    required bool forMarks,
+  }) async {
+    await _controller.getTeacherClasses();
+    final classes = _controller.classesList.value;
+
+    if (classes.isEmpty) {
+      showSnackBar('No assigned classes found for this teacher.', context);
+      return;
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: Text(
+                  forMarks ? 'Select Class For Exam Marks' : 'Assigned Classes',
+                  style: sfBoldStyle(fontSize: 16, color: black),
+                ),
+              ),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: classes.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, index) {
+                    final item = classes[index];
+                    return ListTile(
+                      title: Text(
+                        '${item.section}-${item.grade}',
+                      ),
+                      subtitle: Text('Students: ${item.numberOfstudents}'),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        final data = {
+                          'grade': item.grade.toString(),
+                          'classid': item.classroomID.toString(),
+                        };
+                        Get.toNamed(AppPages.tsubjects, parameters: data);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _quickActionCard({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: primaryColor),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: sfMediumStyle(fontSize: 12, color: black),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +194,49 @@ class HomeTeacher extends StatelessWidget {
         const SizedBox(
           height: 15,
         ),
+
+        const DividerParent(
+          text: 'Teacher Flow',
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          alignment: WrapAlignment.center,
+          children: [
+            _quickActionCard(
+              label: 'View Assigned Classes',
+              icon: Icons.class_,
+              onTap: () => _openClassPicker(context, forMarks: false),
+            ),
+            _quickActionCard(
+              label: 'Mark Attendance',
+              icon: Icons.fact_check,
+              onTap: () => Get.to(() => const TeacherAttendanceScreen()),
+            ),
+            _quickActionCard(
+              label: 'Upload Homework',
+              icon: Icons.task,
+              onTap: () => Get.to(() => TeacherTasksPage()),
+            ),
+            _quickActionCard(
+              label: 'Upload Study Material',
+              icon: Icons.attachment,
+              onTap: () => Get.to(() => TeacherAdjuncts()),
+            ),
+            _quickActionCard(
+              label: 'Enter Exam Marks',
+              icon: Icons.assessment,
+              onTap: () => Get.to(() => const EnterMarksScreen()),
+            ),
+            _quickActionCard(
+              label: 'Send Message',
+              icon: Icons.campaign,
+              onTap: () => Get.to(() => const TAnnouncementsScreen()),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
 
        
         FutureBuilder(
@@ -278,7 +416,7 @@ void initState() {
   IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
   _port.listen((dynamic data) {
     String id = data[0];
-    DownloadTaskStatus status = data[1];
+    int status = data[1];
     int progress = data[2];
     setState((){ });
   });
@@ -293,7 +431,7 @@ void dispose() {
 }
 
 @pragma('vm:entry-point')
-static void downloadCallback(String id, DownloadTaskStatus status, int progress) {
+static void downloadCallback(String id, int status, int progress) {
   final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
   send?.send([id, status, progress]);
 }

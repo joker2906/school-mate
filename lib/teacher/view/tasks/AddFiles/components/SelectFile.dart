@@ -56,10 +56,10 @@ pickImage(ImageSource source) async {
 
 showNotification(String filename, String path) {
   flutterLocalNotificationsPlugin.show(
-      0,
-      filename,
-      "The file has been downloaded\n$path",
-      NotificationDetails(
+      id: 0,
+      title: filename,
+      body: "The file has been downloaded\n$path",
+      notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(channel.id, channel.name,
               importance: Importance.high,
               color: primaryColor,

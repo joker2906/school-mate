@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:school_management_system/public/config/user_information.dart';
+import 'package:school_management_system/public/notifications/notification_push_bridge.dart';
+import 'package:school_management_system/public/notifications/notifications_screen.dart';
 import 'package:school_management_system/public/utils/constant.dart';
+import 'package:school_management_system/student/view/Fees/student_fees_screen.dart';
 
 import '../../../public/utils/font_style.dart';
 import '../../../routes/app_pages.dart';
 import '../../controllers/home_controller.dart';
-import '../../resources/Parent/parentApi.dart';
 import '../../resources/complaint/complaintApi.dart';
 
 var homeController = Get.put<HomeController>(HomeController());
@@ -26,6 +28,9 @@ class SideMenue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatarUrl = UserInformation.urlAvatr.toString().trim();
+    final role = (GetStorage().read('role') ?? '').toString();
+
     addcomplaintapi(String content, String title, String id) async {
       bool ok = await ComplaintApi.addComplaintapi(contentController.text,
           titleController.text, UserInformation.User_uId);
@@ -57,9 +62,18 @@ class SideMenue extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.grey),
-                  image: DecorationImage(
-                      image: NetworkImage(UserInformation.urlAvatr),
-                      fit: BoxFit.cover),
+                ),
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage:
+                      avatarUrl.isNotEmpty ? NetworkImage(avatarUrl) : null,
+                  child: avatarUrl.isEmpty
+                      ? const Icon(
+                          Icons.person,
+                          size: 64,
+                          color: Colors.grey,
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -103,17 +117,30 @@ class SideMenue extends StatelessWidget {
                         itemCount: homeController.mychilds.length,
                         itemBuilder: (BuildContext context, int index) {
                           final user = homeController.mychilds[index];
+                          final childAvatar =
+                              (user.urlAvatar ?? '').toString().trim();
                           return Container(
                             height: 75,
                             child: ListTile(
                               leading: CircleAvatar(
                                 radius: 25,
-                                backgroundImage: NetworkImage(user.urlAvatar),
+                                backgroundColor: Colors.grey.shade200,
+                                backgroundImage: childAvatar.isNotEmpty
+                                    ? NetworkImage(childAvatar)
+                                    : null,
+                                child: childAvatar.isEmpty
+                                    ? const Icon(
+                                        Icons.person,
+                                        color: Colors.grey,
+                                      )
+                                    : null,
                               ),
                               title: TextButton(
                                   onPressed: () {
-                                    UserInformation.fees =
-                                        UserInformation.classid = user.classid;
+                                  UserInformation.fees = user.fees;
+                                    UserInformation.fullfees =
+                                      (user.fees ?? '').toString();
+                                  UserInformation.classid = user.classid;
                                     UserInformation.first_name = user.firstName;
                                     UserInformation.last_name = user.lastName;
                                     UserInformation.phone = user.phone;
@@ -123,10 +150,18 @@ class SideMenue extends StatelessWidget {
                                         user.studentClass;
                                     UserInformation.clasname =
                                         user.studentClass;
-                                    UserInformation.urlAvatr = user.urlAvatar;
-                                    /* UserInformation.grade_average =
-                                        user.average;
-                                   UserInformation.grade = user.studentGrade;*/
+                                    UserInformation.urlAvatr =
+                                      (user.urlAvatar ?? '').toString();
+                                    UserInformation.grade_average =
+                                      user.average is num
+                                        ? (user.average as num).toDouble()
+                                        : (double.tryParse(
+                                              user.average?.toString() ?? '0',
+                                            ) ??
+                                            0.0);
+                                    UserInformation.grade =
+                                      int.tryParse(user.studentGrade ?? '0') ??
+                                        0;
                                     UserInformation.User_uId = user.id;
                                     UserInformation.email = user.email;
                                     UserInformation.uParent = false;
@@ -270,6 +305,66 @@ class SideMenue extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Icon(
+                      Icons.notifications_none,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Get.to(() => const NotificationsScreen());
+                    },
+                    child: Text(
+                      "Notifications",
+                      style: sfMediumStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (role == 'student')
+              Container(
+                height: 50,
+                width: 320,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 20),
+                      child: Icon(
+                        Icons.payments_outlined,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.to(() => const StudentFeesScreen());
+                      },
+                      child: Text(
+                        "Fees",
+                        style: sfMediumStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              height: 50,
+              width: 320,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: Icon(
                       Icons.logout,
@@ -281,7 +376,9 @@ class SideMenue extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Get.toNamed(AppPages.INITIAL);
+                      NotificationPushBridge.stop();
+                      GetStorage().erase();
+                      Get.offAllNamed(AppPages.INITIAL);
                     },
                     child: Text(
                       "log out",

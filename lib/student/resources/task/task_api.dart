@@ -6,6 +6,27 @@ import '../../models/task/taskMark_model.dart';
 import '../../models/task/task_result_model.dart';
 
 class taskServices {
+  String _resolveStudentClassroom(Map<String, dynamic>? data) {
+    if (data == null) {
+      return UserInformation.classid.toString();
+    }
+
+    final directClassId = data['class_id'];
+    if (directClassId != null && directClassId.toString().isNotEmpty) {
+      return directClassId.toString();
+    }
+
+    final classValue = data['class'];
+    if (classValue is String && classValue.isNotEmpty) {
+      return classValue;
+    }
+    if (classValue is Map && classValue['id'] != null) {
+      return classValue['id'].toString();
+    }
+
+    return UserInformation.classid.toString();
+  }
+
   getTasks() async {
     print('=============Classroom is :==============');
     print(UserInformation.classroom);
@@ -14,7 +35,7 @@ class taskServices {
         .doc('/students/${UserInformation.User_uId}')
         .get()
         .then((value) {
-      UserInformation.classroom = value.data()!['class'].id;
+      UserInformation.classroom = _resolveStudentClassroom(value.data());
     });
     print(UserInformation.classroom);
     var tasks = [];
@@ -43,6 +64,7 @@ class taskServices {
           deadline: deadline,
           uploadDate: uploadedate,
           id: taskList.docs[i].data()['id'].toString(),
+          url: taskList.docs[i].data()['url']?.toString() ?? '',
         ));
       }
     }

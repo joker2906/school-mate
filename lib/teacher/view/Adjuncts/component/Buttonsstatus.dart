@@ -256,7 +256,7 @@ class ButtonsFunctions {
                         padding: EdgeInsets.only(
                           left: 30.w,
                         ),
-                        child: const ChosingGradeBar(),
+                        child: TrefChosingGradeBar(),
                       ),
                       SizedBox(
                         height: 24.h,
@@ -269,7 +269,7 @@ class ButtonsFunctions {
                         child: SizedBox(
                           width: 100.w,
                           child: const Text(
-                            'Video name',
+                            'Quiz title',
                             style: TextStyle(
                               color: darkGray,
                               fontFamily: RedHatDisplay.medium,
@@ -287,13 +287,12 @@ class ButtonsFunctions {
                         ),
                         child: TextField(
                           onChanged: (String value) {
-                            print(value);
-                            _pdfController.pdf_name.value = value;
+                            _pdfController.quiz_name.value = value;
                           },
                           decoration: InputDecoration(
                             label: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('Enter reference name'),
+                              child: Text('Enter quiz title'),
                             ),
                             labelStyle: TextStyle(
                               color: primaryColor,
@@ -314,21 +313,110 @@ class ButtonsFunctions {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                          left: 30.w,
+                          left: 24.w,
+                          right: 24.w,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Add file'),
-                            MaterialButton(
-                              onPressed: () {},
-                              child: Icon(
-                                Icons.attach_file,
-                                size: 20,
-                                color: gray,
+                        child: TextField(
+                          maxLines: 3,
+                          onChanged: (String value) {
+                            _pdfController.quiz_question.value = value;
+                          },
+                          decoration: InputDecoration(
+                            label: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Question'),
+                            ),
+                            labelStyle: TextStyle(
+                              color: primaryColor,
+                              fontSize: 15,
+                            ),
+                            fillColor: backgroundColor,
+                            filled: true,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: BorderSide(
+                                    width: 0.0, color: backgroundColor)),
+                            contentPadding: EdgeInsets.all(8.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 24.w,
+                          right: 24.w,
+                        ),
+                        child: TextField(
+                          onChanged: (String value) {
+                            _pdfController.quiz_answer.value = value;
+                          },
+                          decoration: InputDecoration(
+                            label: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Correct answer'),
+                            ),
+                            labelStyle: TextStyle(
+                              color: primaryColor,
+                              fontSize: 15,
+                            ),
+                            fillColor: backgroundColor,
+                            filled: true,
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                                borderSide: BorderSide(
+                                    width: 0.0, color: backgroundColor)),
+                            contentPadding: EdgeInsets.all(8.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 16.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 24.w,
+                          right: 24.w,
+                        ),
+                        child: GetBuilder<TreferenceBottomsheetController>(
+                          init: TreferenceBottomsheetController(),
+                          builder: (controller) {
+                            return DropdownButtonFormField<String>(
+                              value: _pdfController.quiz_difficulty.value,
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: primaryColor, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: primaryColor, width: 2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                               ),
-                            )
-                          ],
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Easy',
+                                  child: Text('Easy'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Medium',
+                                  child: Text('Medium'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Hard',
+                                  child: Text('Hard'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  _pdfController.updateQuizDifficulty(value);
+                                }
+                              },
+                            );
+                          },
                         ),
                       ),
                       SizedBox(
@@ -339,6 +427,18 @@ class ButtonsFunctions {
                 ),
                 AddButton(
                   Bcontext: context,
+                  onpress: () async {
+                    if (_pdfController.quiz_name.value.isEmpty ||
+                        _pdfController.quiz_question.value.isEmpty ||
+                        _pdfController.quiz_answer.value.isEmpty) {
+                      EasyLoading.showError('Fill all quiz fields');
+                      return;
+                    }
+                    EasyLoading.show();
+                    await _pdfController.addQuiz();
+                    Get.back();
+                    EasyLoading.showSuccess('Quiz created');
+                  },
                 ),
               ],
             ),

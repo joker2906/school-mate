@@ -1,0 +1,11 @@
+name: cloud_firestore
+description: Local FastAPI-backed cloud_firestore compatibility layer.
+version: 0.0.1
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:

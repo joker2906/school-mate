@@ -21,6 +21,9 @@ class ParentApi {
               lastName: value.docs[i]['last_name'],
               urlAvatar: value.docs[i]['urlAvatar'],
               fees: value.docs[i]['fees'].toString(),
+                fullfees: (value.docs[i]['full_fees'] ?? value.docs[i]['fees'])
+                  .toString(),
+                paidfees: (value.docs[i]['paid_fees'] ?? '0').toString(),
               phone: value.docs[i]['phone'].toString(),
               parentPhone: value.docs[i]['parent_phone'].toString(),
               studentClass: value.docs[i]['class_name'],

@@ -1,15 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '2.1.0'
+
     repositories {
         google()
         mavenCentral()
     }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.3.10'
-    }
+    dependencies {}
 }
 
 allprojects {
@@ -20,13 +17,33 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
-subprojects {
+
+subprojects { project ->
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(':app')
+
+    // AGP 8 requires explicit BuildConfig generation when buildConfigField is used.
+    project.plugins.withId('com.android.library') {
+        def androidExt = project.extensions.findByName('android')
+        if (androidExt == null) {
+            return
+        }
+
+        androidExt.buildFeatures.buildConfig = true
+
+        // Older plugin versions may only declare package in AndroidManifest.xml.
+        if (!androidExt.namespace) {
+            def manifestFile = project.file('src/main/AndroidManifest.xml')
+            if (manifestFile.exists()) {
+                def manifest = new XmlSlurper(false, false).parse(manifestFile)
+                def manifestPackage = manifest.@package?.text()
+                if (manifestPackage) {
+                    androidExt.namespace = manifestPackage
+                }
+            }
+        }
+    }
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

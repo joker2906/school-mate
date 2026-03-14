@@ -23,9 +23,11 @@ class TaskScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: EdgeInsets.only(top: 40.0),
-                  child: RaisedButton(
-                    color: Colors.white,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
                       padding: EdgeInsets.fromLTRB(70, 10, 70, 10),
+                    ),
                    onPressed: () {  },
                    child:Text ("ADD FILE + ")
 

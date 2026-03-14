@@ -1,0 +1,621 @@
+{
+  "collections": {
+    "students": {
+      "demo_student_uid": {
+        "uid": "demo_student_uid",
+        "email": "student@schoolmate.test",
+        "first_name": "Sam",
+        "last_name": "Student",
+        "fees": "1250",
+        "full_fees": "2000",
+        "paid_fees": "750",
+        "class_id": "class_room_10_a",
+        "phone": "9999999991",
+        "parent_phone": "9999999992",
+        "parent_email": "parent@schoolmate.test",
+        "class_name": "10-A",
+        "urlAvatar": "",
+        "grade_average": 88,
+        "grade": "10",
+        "lastMessageTime": {
+          "__timestamp__": "2026-03-14T10:21:54.123036Z"
+        },
+        "token": "1ZOsk6WD8HKDQSiFpgN9UW1z7DEAHGOr"
+      }
+    },
+    "teacher": {
+      "demo_teacher_uid": {
+        "uid": "demo_teacher_uid",
+        "email": "teacher@schoolmate.test",
+        "first_name": "Tariq",
+        "last_name": "Teacher",
+        "phone": "9999999993",
+        "subjects": [
+          "subject_math_10",
+          "subject_science_10"
+        ],
+        "urlAvatar": "",
+        "token": "et1tuz2o0q1jntP2sKWLd3vUQqfWnz4T"
+      },
+      "demo_teacher": {
+        "uid": "demo_teacher",
+        "email": "teacher@example.com",
+        "first_name": "Demo",
+        "subjects": [
+          "Math",
+          "Physics"
+        ]
+      }
+    },
+    "parents": {
+      "demo_parent_uid": {
+        "uid": "demo_parent_uid",
+        "email": "parent@schoolmate.test",
+        "first_name": "Pia",
+        "last_name": "Parent",
+        "urlAvatar": "",
+        "token": "juZfuPaESr9CKOUi5Na1QHUld4F4XW2v"
+      }
+    },
+    "admins": {
+      "demo_admin_uid": {
+        "uid": "demo_admin_uid",
+        "email": "admin@schoolmate.test",
+        "first_name": "Ava",
+        "last_name": "Admin",
+        "urlAvatar": "",
+        "token": "XIWLqpDyz0JLG3ORyefe8rV9RVtvbGJD"
+      }
+    },
+    "chats/demo_student_uid/messages": {
+      "4d123f6102527fa2b9a5": {
+        "idUser": "demo_teacher_uid",
+        "urlAvatar": "",
+        "username": "Demo",
+        "message": "hlo",
+        "createdAt": {
+          "__timestamp__": "2026-03-13T07:03:42.820049Z"
+        },
+        "uid": "demo_student_uid"
+      },
+      "ed485bbbdc931e0ead55": {
+        "idUser": "demo_teacher_uid",
+        "urlAvatar": "",
+        "username": "Demo",
+        "message": "hi",
+        "createdAt": {
+          "__timestamp__": "2026-03-13T07:03:49.203011Z"
+        },
+        "uid": "demo_student_uid"
+      },
+      "chat_msg_1": {
+        "idUser": "demo_teacher_uid",
+        "urlAvatar": "",
+        "username": "Tariq",
+        "message": "Please complete the algebra worksheet before Saturday.",
+        "createdAt": {
+          "__timestamp__": "2026-03-13T07:03:42.820049Z"
+        },
+        "uid": "demo_student_uid"
+      },
+      "chat_msg_2": {
+        "idUser": "demo_teacher_uid",
+        "urlAvatar": "",
+        "username": "Tariq",
+        "message": "I uploaded a new science reference video for your class.",
+        "createdAt": {
+          "__timestamp__": "2026-03-13T07:03:49.203011Z"
+        },
+        "uid": "demo_student_uid"
+      },
+      "0b59a94bc43f629e9780": {
+        "idUser": "demo_teacher_uid",
+        "urlAvatar": "",
+        "username": "Tariq",
+        "message": "hi",
+        "createdAt": {
+          "__timestamp__": "2026-03-14T10:21:54.108765Z"
+        },
+        "uid": "demo_student_uid"
+      }
+    },
+    "class-room": {
+      "class_room_10_a": {
+        "uid": "class_room_10_a",
+        "acadimic_year": "10",
+        "section": "A",
+        "number_of_students": 1
+      }
+    },
+    "acadimic_year": {
+      "10": {
+        "id": "10",
+        "grade": 10,
+        "subject": [
+          "subject_math_10",
+          "subject_science_10"
+        ]
+      }
+    },
+    "subject": {
+      "subject_math_10": {
+        "id": "subject_math_10",
+        "name": "Mathematics",
+        "subject_grade": "10"
+      },
+      "subject_science_10": {
+        "id": "subject_science_10",
+        "name": "Science",
+        "subject_grade": "10"
+      }
+    },
+    "relation": {
+      "relation_math_10a": {
+        "uid": "relation_math_10a",
+        "teacher": "demo_teacher_uid",
+        "teacher_name": "Tariq Teacher",
+        "grade": "10",
+        "subject": "subject_math_10",
+        "subject_name": "Mathematics",
+        "classrooms": [
+          "class_room_10_a"
+        ]
+      },
+      "relation_science_10a": {
+        "uid": "relation_science_10a",
+        "teacher": "demo_teacher_uid",
+        "teacher_name": "Tariq Teacher",
+        "grade": "10",
+        "subject": "subject_science_10",
+        "subject_name": "Science",
+        "classrooms": [
+          "class_room_10_a"
+        ]
+      }
+    },
+    "classProgram": {
+      "program_class_assembly": {
+        "id": "program_class_assembly",
+        "type": "Assembly",
+        "url": "https://schoolmate.local/programs/class-assembly",
+        "date": {
+          "__timestamp__": "2026-03-20T08:00:00Z"
+        },
+        "class-room": "class_room_10_a"
+      },
+      "program_class_lab": {
+        "id": "program_class_lab",
+        "type": "Science Lab",
+        "url": "https://schoolmate.local/programs/science-lab",
+        "date": {
+          "__timestamp__": "2026-03-22T10:30:00Z"
+        },
+        "class-room": "class_room_10_a"
+      }
+    },
+    "teacherProgram": {
+      "program_teacher_meeting": {
+        "id": "program_teacher_meeting",
+        "type": "Staff Meeting",
+        "url": "https://schoolmate.local/programs/staff-meeting",
+        "date": {
+          "__timestamp__": "2026-03-18T13:00:00Z"
+        },
+        "teacher": "demo_teacher_uid"
+      }
+    },
+    "announcement": {
+      "ann_student_exam": {
+        "id": "ann_student_exam",
+        "title": "Midterm Schedule",
+        "content": "Mathematics midterm starts next Monday at 9:00 AM.",
+        "date": {
+          "__timestamp__": "2026-03-13T09:00:00Z"
+        },
+        "class-room": "class_room_10_a",
+        "type": "Students"
+      },
+      "ann_teacher_meeting": {
+        "id": "ann_teacher_meeting",
+        "title": "Teacher Briefing",
+        "content": "All teachers should submit week plans before Friday noon.",
+        "date": {
+          "__timestamp__": "2026-03-13T11:00:00Z"
+        },
+        "type": "Teachers"
+      },
+      "ann_all_holiday": {
+        "id": "ann_all_holiday",
+        "title": "School Holiday",
+        "content": "School will be closed on March 25 for maintenance.",
+        "date": {
+          "__timestamp__": "2026-03-13T12:00:00Z"
+        },
+        "type": "All"
+      }
+    },
+    "reference": {
+      "ref_math_book": {
+        "id": "ref_math_book",
+        "uid": "ref_math_book",
+        "grade": 10,
+        "name": "Algebra Revision Sheet",
+        "subject_id": "subject_math_10",
+        "subjectName": "Mathematics",
+        "type": "book",
+        "url": "https://schoolmate.local/reference/algebra-sheet.pdf"
+      },
+      "ref_science_video": {
+        "id": "ref_science_video",
+        "uid": "ref_science_video",
+        "grade": 10,
+        "name": "Cells Introduction",
+        "subject_id": "subject_science_10",
+        "subjectName": "Science",
+        "type": "video",
+        "url": "https://schoolmate.local/reference/cells-video",
+        "teacher_id": "demo_teacher_uid",
+        "teacher_name": "Tariq Teacher"
+      }
+    },
+    "lessons": {
+      "lesson_math_linear": {
+        "id": "lesson_math_linear",
+        "subject": "subject_math_10",
+        "name": "Linear Equations"
+      },
+      "lesson_math_geometry": {
+        "id": "lesson_math_geometry",
+        "subject": "subject_math_10",
+        "name": "Geometry Basics"
+      },
+      "lesson_science_cells": {
+        "id": "lesson_science_cells",
+        "subject": "subject_science_10",
+        "name": "Cells and Tissues"
+      },
+      "etvcs55rxzlamcyg5zie": {
+        "name": "hindi",
+        "isTaken": false,
+        "id": "etvcs55rxzlamcyg5zie",
+        "subject": "subject_math_10"
+      }
+    },
+    "Task": {
+      "task_math_week1": {
+        "id": "task_math_week1",
+        "name": "Algebra Worksheet 1",
+        "classroom": "class_room_10_a",
+        "deadline": {
+          "__timestamp__": "2026-03-21T14:00:00Z"
+        },
+        "subjectName": "Mathematics",
+        "subject_id": "subject_math_10",
+        "teacher_id": "demo_teacher_uid",
+        "uploadDate": {
+          "__timestamp__": "2026-03-13T08:00:00Z"
+        },
+        "url": "https://schoolmate.local/tasks/algebra-worksheet-1.pdf"
+      }
+    },
+    "Task-result": {
+      "task_result_math_1": {
+        "checked": true,
+        "classroom_id": "class_room_10_a",
+        "class_id": "class_room_10_a",
+        "mark": 17,
+        "student_id": "demo_student_uid",
+        "task_id": "task_math_week1",
+        "task_result_id": "task_result_math_1",
+        "uploadDate": {
+          "__timestamp__": "2026-03-13T12:30:00Z"
+        },
+        "url": "https://schoolmate.local/submissions/algebra-worksheet-1.pdf"
+      }
+    },
+    "tests": {
+      "test_math_1": {
+        "id": "test_math_1",
+        "subject_id": "subject_math_10",
+        "grade": "10",
+        "student_id": "demo_student_uid",
+        "result": 85,
+        "taskid": "task_math_week1",
+        "StudenUploadDate": "2026/03/13"
+      }
+    },
+    "homeworks": {
+      "homework_math_1": {
+        "id": "homework_math_1",
+        "subject_id": "subject_math_10",
+        "grade": "10",
+        "student_id": "demo_student_uid",
+        "result": 90
+      }
+    },
+    "exam1": {
+      "exam1_math_1": {
+        "id": "exam1_math_1",
+        "subject_id": "subject_math_10",
+        "grade": "10",
+        "student_id": "demo_student_uid",
+        "result": 87
+      }
+    },
+    "exam2": {
+      "exam2_math_1": {
+        "id": "exam2_math_1",
+        "subject_id": "subject_math_10",
+        "grade": "10",
+        "student_id": "demo_student_uid",
+        "result": 89
+      }
+    },
+    "attendance": {
+      "class_room_10_a_demo_student_uid_2026-03-10": {
+        "id": "class_room_10_a_demo_student_uid_2026-03-10",
+        "class_id": "class_room_10_a",
+        "student_id": "demo_student_uid",
+        "status": "present",
+        "date_key": "2026-03-10",
+        "marked_by": "demo_teacher_uid",
+        "updated_at": {
+          "__timestamp__": "2026-03-10T08:10:00Z"
+        }
+      },
+      "class_room_10_a_demo_student_uid_2026-03-11": {
+        "id": "class_room_10_a_demo_student_uid_2026-03-11",
+        "class_id": "class_room_10_a",
+        "student_id": "demo_student_uid",
+        "status": "present",
+        "date_key": "2026-03-11",
+        "marked_by": "demo_teacher_uid",
+        "updated_at": {
+          "__timestamp__": "2026-03-11T08:10:00Z"
+        }
+      },
+      "class_room_10_a_demo_student_uid_2026-03-12": {
+        "id": "class_room_10_a_demo_student_uid_2026-03-12",
+        "class_id": "class_room_10_a",
+        "student_id": "demo_student_uid",
+        "status": "absent",
+        "date_key": "2026-03-12",
+        "marked_by": "demo_teacher_uid",
+        "updated_at": {
+          "__timestamp__": "2026-03-12T08:10:00Z"
+        }
+      },
+      "class_room_10_a_demo_student_uid_2026-03-14": {
+        "id": "class_room_10_a_demo_student_uid_2026-03-14",
+        "class_id": "class_room_10_a",
+        "student_id": "demo_student_uid",
+        "status": "absent",
+        "date_key": "2026-03-14",
+        "marked_by": "demo_teacher_uid",
+        "updated_at": {
+          "__timestamp__": "2026-03-14T10:21:40.776333Z"
+        }
+      }
+    },
+    "fee-payments": {
+      "fee_pay_demo_1": {
+        "id": "fee_pay_demo_1",
+        "student_id": "demo_student_uid",
+        "amount": 750,
+        "note": "Initial installment",
+        "created_at": {
+          "__timestamp__": "2026-03-09T08:00:00Z"
+        },
+        "recorded_by": "admin"
+      }
+    },
+    "notifications": {
+      "notif_welcome_student": {
+        "id": "notif_welcome_student",
+        "title": "Welcome to SchoolMate",
+        "body": "Your account is active. Check attendance and fees from the drawer menu.",
+        "type": "general",
+        "targets": [
+          "demo_student_uid",
+          "role:student"
+        ],
+        "data": {},
+        "created_at": {
+          "__timestamp__": "2026-03-13T10:00:00Z"
+        },
+        "read_by": [],
+        "pushed_to": [
+          "demo_student_uid"
+        ],
+        "last_pushed_at": {
+          "__timestamp__": "2026-03-14T13:36:14.444797Z"
+        }
+      },
+      "attendance_class_room_10_a_demo_student_uid_2026-03-14": {
+        "id": "attendance_class_room_10_a_demo_student_uid_2026-03-14",
+        "title": "Attendance Updated",
+        "body": "Your attendance for 2026-03-14 is marked as ABSENT.",
+        "type": "attendance",
+        "targets": [
+          "demo_student_uid",
+          "role:student",
+          "demo_parent_uid"
+        ],
+        "data": {
+          "class_id": "class_room_10_a",
+          "date_key": "2026-03-14",
+          "status": "absent"
+        },
+        "created_at": {
+          "__timestamp__": "2026-03-14T10:21:40.783702Z"
+        },
+        "read_by": [],
+        "pushed_to": [
+          "demo_student_uid",
+          "demo_parent_uid"
+        ],
+        "last_pushed_at": {
+          "__timestamp__": "2026-03-14T13:36:14.710728Z"
+        }
+      },
+      "parent_attendance_class_room_10_a_demo_student_uid_2026-03-14": {
+        "id": "parent_attendance_class_room_10_a_demo_student_uid_2026-03-14",
+        "title": "Child Attendance Update",
+        "body": "Your child's attendance for 2026-03-14 has been marked as ABSENT.",
+        "type": "attendance",
+        "targets": [
+          "demo_parent_uid",
+          "role:parent"
+        ],
+        "data": {
+          "class_id": "class_room_10_a",
+          "date_key": "2026-03-14",
+          "status": "absent",
+          "student_id": "demo_student_uid"
+        },
+        "created_at": {
+          "__timestamp__": "2026-03-14T10:21:40.788838Z"
+        },
+        "read_by": [],
+        "pushed_to": [
+          "demo_parent_uid",
+          "demo_student_uid"
+        ],
+        "last_pushed_at": {
+          "__timestamp__": "2026-03-14T13:32:15.793631Z"
+        }
+      },
+      "tvc2t940e1bxk8y9pys1": {
+        "id": "tvc2t940e1bxk8y9pys1",
+        "title": "New Exam Created: midd",
+        "body": "An exam \"midd\" (TESTS) has been created for grade 10. Max marks: 100.",
+        "type": "exam",
+        "targets": [
+          "role:teacher"
+        ],
+        "data": {
+          "exam_id": "hq9unf14aw75oq0a16px",
+          "subject_id": "456",
+          "class_id": "10",
+          "grade": "10",
+          "exam_type": "tests"
+        },
+        "sender_uid": "",
+        "sender_role": "",
+        "push_enabled": true,
+        "created_at": {
+          "__timestamp__": "2026-03-14T13:21:57.862848Z"
+        },
+        "read_by": [],
+        "pushed_to": [
+          "demo_teacher_uid",
+          ""
+        ],
+        "last_pushed_at": {
+          "__timestamp__": "2026-03-14T13:35:44.569330Z"
+        }
+      }
+    },
+    "quiz": {
+      "quiz_math_intro": {
+        "uid": "quiz_math_intro",
+        "name": "Algebra Quick Quiz",
+        "subject_name": "Mathematics",
+        "diffculty": "Easy",
+        "question": "Solve 2x + 4 = 10"
+      }
+    },
+    "quiz-results": {
+      "4b3zvkkeuz6ddxn4s3hm": {
+        "uid": "4b3zvkkeuz6ddxn4s3hm",
+        "quiz_id": "quiz_math_intro",
+        "student_id": "demo_student_uid",
+        "student_name": "Sam Student",
+        "answer": "3",
+        "correct_answer": "",
+        "is_correct": false,
+        "submitted_at": {
+          "__timestamp__": "2026-03-13T07:43:58.736191Z"
+        },
+        "subject_name": "Mathematics",
+        "quiz_name": "Algebra Quick Quiz"
+      }
+    },
+    "complaint": {
+      "197ea9dfa45ded9556bb": {
+        "content": "",
+        "title": "",
+        "uid": "197ea9dfa45ded9556bb",
+        "student": "demo_student_uid",
+        "date": {
+          "__timestamp__": "2026-03-13T11:35:14.889760Z"
+        }
+      },
+      "226d447d521b79859008": {
+        "content": "",
+        "title": "",
+        "uid": "226d447d521b79859008",
+        "student": "demo_student_uid",
+        "date": {
+          "__timestamp__": "2026-03-14T13:20:48.331785Z"
+        }
+      }
+    },
+    "exams": {
+      "hq9unf14aw75oq0a16px": {
+        "id": "hq9unf14aw75oq0a16px",
+        "name": "midd",
+        "subject_id": "456",
+        "class_id": "10",
+        "grade": "10",
+        "exam_type": "tests",
+        "max_marks": 100,
+        "created_at": {
+          "__timestamp__": "2026-03-14T13:21:57.519735Z"
+        },
+        "created_by": "admin"
+      }
+    }
+  },
+  "auth": {
+    "users": {
+      "demo_student_uid": {
+        "uid": "demo_student_uid",
+        "email": "student@schoolmate.test",
+        "password": "Demo@123",
+        "created_at": "2026-03-13T00:00:00+00:00"
+      },
+      "demo_teacher_uid": {
+        "uid": "demo_teacher_uid",
+        "email": "teacher@schoolmate.test",
+        "password": "Demo@123",
+        "created_at": "2026-03-13T00:00:00+00:00"
+      },
+      "demo_parent_uid": {
+        "uid": "demo_parent_uid",
+        "email": "parent@schoolmate.test",
+        "password": "Demo@123",
+        "created_at": "2026-03-13T00:00:00+00:00"
+      },
+      "demo_admin_uid": {
+        "uid": "demo_admin_uid",
+        "email": "admin@schoolmate.test",
+        "password": "Demo@123",
+        "created_at": "2026-03-13T00:00:00+00:00"
+      },
+      "c91c0fb46dad205c2ea33609": {
+        "uid": "c91c0fb46dad205c2ea33609",
+        "email": "migration_test_1773384752@example.com",
+        "password": "pass1234",
+        "created_at": "2026-03-13T06:52:32.855735+00:00"
+      }
+    },
+    "email_index": {
+      "student@schoolmate.test": "demo_student_uid",
+      "teacher@schoolmate.test": "demo_teacher_uid",
+      "parent@schoolmate.test": "demo_parent_uid",
+      "admin@schoolmate.test": "demo_admin_uid",
+      "migration_test_1773384752@example.com": "c91c0fb46dad205c2ea33609"
+    }
+  }
+}

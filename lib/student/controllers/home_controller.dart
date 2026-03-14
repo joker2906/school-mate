@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_zoom_drawer/config.dart';
-import 'package:get/get.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:school_management_system/public/config/user_information.dart';
 import 'package:school_management_system/student/controllers/subject/subjectController.dart';
+import 'package:school_management_system/student/view/Attendance/student_attendance_screen.dart';
 import 'package:school_management_system/student/view/Adjuncts/adjuncts.dart';
 import 'package:school_management_system/student/view/Home/home_body.dart';
 import 'package:school_management_system/student/view/TasksScreen/TasksPage.dart';
@@ -15,7 +15,6 @@ import 'package:school_management_system/student/view/TeacherEmails/Teacherspage
 import '../../main.dart';
 import '../resources/Parent/parentApi.dart';
 import '../resources/Programapi/programsapi.dart';
-import '../view/Chat/chats_page.dart';
 
 var _SubjectController = Get.put<SubjectController>(SubjectController());
 
@@ -25,10 +24,10 @@ class HomeController extends GetxController {
     HomeScreen(),
     TasksPage(),
     Refrences(),
-    ChatsPage(),
+    StudentAttendanceScreen(),
   ].obs;
 
-  var appBarTitles = ['Home', 'Tasks', 'Adjuncts', 'Chat'].obs;
+  var appBarTitles = ['Home', 'Tasks', 'Adjuncts', 'Attendance'].obs;
   var myprograms = [].obs;
   var mychilds = [].obs;
 
@@ -56,10 +55,10 @@ class HomeController extends GetxController {
 
   showNotification(String filename, String path) {
     flutterLocalNotificationsPlugin.show(
-        0,
-        filename,
-        "The file has been downloaded\n$path",
-        NotificationDetails(
+        id: 0,
+        title: filename,
+        body: "The file has been downloaded\n$path",
+        notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(channel.id, channel.name,
                 importance: Importance.high,
                 color: Colors.blue,
@@ -69,10 +68,10 @@ class HomeController extends GetxController {
 
   showNotification2(String filename, String path) {
     flutterLocalNotificationsPlugin.show(
-        0,
-        filename,
-        path,
-        NotificationDetails(
+        id: 0,
+        title: filename,
+        body: path,
+        notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(channel.id, channel.name,
                 importance: Importance.high,
                 color: Colors.blue,

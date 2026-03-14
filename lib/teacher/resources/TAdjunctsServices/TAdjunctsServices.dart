@@ -129,4 +129,35 @@ class TAdjunctsServices {
       print('@#@#@#@#@#@#@#@#');
     }
   }
+
+  addQuiz({
+    required int grade,
+    required String name,
+    required String subjectName,
+    required String subjectId,
+    required String difficulty,
+    required String question,
+    required String answer,
+  }) async {
+    try {
+      var id = FirebaseFirestore.instance.collection('quiz').doc().id;
+      var tname = UserInformation.first_name + ' ' + UserInformation.last_name;
+      await FirebaseFirestore.instance.collection('quiz').doc(id).set({
+        'uid': id,
+        'name': name,
+        'subject_name': subjectName,
+        'subject_id': subjectId,
+        'grade': grade,
+        'diffculty': difficulty,
+        'question': question,
+        'answer': answer,
+        'teacher_id': UserInformation.User_uId,
+        'teacher_name': tname,
+        'createdAt': Timestamp.now(),
+      });
+    } catch (e) {
+      print('Failed to add quiz');
+      print(e);
+    }
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:school_management_system/public/config/user_information.dart';
+import 'package:school_management_system/public/notifications/notification_service.dart';
 import 'package:school_management_system/student/models/task/task_model.dart';
 import 'package:school_management_system/student/view/Adjuncts/refrences.dart';
 import 'package:school_management_system/teacher/model/Tasks/tasksModel.dart';
@@ -125,6 +126,19 @@ class TaskServices {
       'uploadDate': Timestamp.fromDate(DateTime.now()),
       'url': url.toString(),
     });
+
+    await NotificationService.createNotification(
+      title: 'New Homework: ${task.name}',
+      body:
+          '${task.subjectName} homework has been posted. Deadline: ${task.deadLine}',
+      targets: ['role:student', 'role:parent', 'class:$classid'],
+      type: 'homework',
+      data: {
+        'task_id': docid,
+        'classroom': classid,
+        'subject_name': task.subjectName,
+      },
+    );
 
     print('Its Done!!!');
   }
@@ -250,5 +264,37 @@ class TaskServices {
       'checked': true,
       'mark': int.parse(mark),
     });
+  }
+  getNotUploadedStudents(String taskId, String classroomId) async {
+    var notUploaded = <Map<String, dynamic>>[];
+    try {
+      final studentsSnap = await FirebaseFirestore.instance
+          .collection('students')
+          .where('class_id', isEqualTo: classroomId)
+          .get();
+      final uploadedSnap = await FirebaseFirestore.instance
+          .collection('Task-result')
+          .where('task_id', isEqualTo: taskId)
+          .get();
+      final uploadedIds = uploadedSnap.docs
+          .map((d) => d.data()['student_id']?.toString() ?? '')
+          .toSet();
+      for (var doc in studentsSnap.docs) {
+        final uid =
+            (doc.data()['uid'] ?? doc.id).toString();
+        if (!uploadedIds.contains(uid)) {
+          notUploaded.add({
+            'name':
+                '${doc.data()['first_name'] ?? ''} ${doc.data()['last_name'] ?? ''}',
+            'photoUrl': doc.data()['urlAvatar']?.toString() ?? '',
+            'uid': uid,
+          });
+        }
+      }
+      return notUploaded;
+    } catch (e) {
+      print(e);
+      return notUploaded;
+    }
   }
 }

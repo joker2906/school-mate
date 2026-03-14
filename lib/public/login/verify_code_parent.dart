@@ -26,17 +26,6 @@ late String A, B, C, D;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-String? str = UserInformation.fullname;
-var arr = str!.split(' ');
-
-final newparent = {
-  "uid": UserInformation.User_uId,
-  "email": UserInformation.email,
-  "first_name": arr[0],
-  "last_name": arr[1],
-  "phone": UserInformation.phone,
-  "urlAvatar": UserInformation.urlAvatr,
-};
 
 class _OtpParentState extends State<OtpParent> {
   @override
@@ -161,15 +150,23 @@ class _OtpParentState extends State<OtpParent> {
                           onPressed: () async {
                             if (UserInformation.parentverifycode ==
                                 A + B + C + D) {
+                              final newparent = {
+                                "uid": UserInformation.User_uId,
+                                "email": UserInformation.email,
+                                "first_name": UserInformation.first_name,
+                                "last_name": UserInformation.last_name,
+                                "phone": UserInformation.phone,
+                                "urlAvatar": UserInformation.urlAvatr,
+                              };
                               await _firestore
                                   .collection('parents')
                                   .doc(UserInformation.User_uId)
                                   .set(newparent);
-                              print("broooooooo");
                               await storage.write(
                                   'uid', UserInformation.User_uId);
+                              await storage.write('role', 'parent');
                               UserInformation.uParent = true;
-                              Get.offAllNamed('/sthome');
+                              Get.offAllNamed('/parhome');
                             } else {
                               showSnackBar("Wrong Code", context);
                             }

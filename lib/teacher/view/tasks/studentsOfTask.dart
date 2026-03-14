@@ -15,6 +15,7 @@ import 'package:school_management_system/student/view/Home/home_appbar.dart';
 import 'package:school_management_system/teacher/controllers/TasksControllers/CheckedStudentTaskInfoController.dart';
 import 'package:school_management_system/teacher/controllers/TasksControllers/studentTaskInfo.dart';
 import 'package:school_management_system/teacher/widgets/ConnectionStateMessages.dart';
+import 'package:school_management_system/teacher/resources/TaskServices/TaskServices.dart';
 
 class StudentsOfTask extends StatelessWidget {
   StudentsOfTask({Key? key, this.taskId, this.taskName}) : super(key: key);
@@ -25,9 +26,10 @@ class StudentsOfTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var data = Get.parameters;
-    uncontroller.task_id.value = data['id']!;
-    chcontroller.task_id.value = data['id']!;
-    print(data['id']);
+    final taskId = data['id'] ?? '';
+    final classroomId = data['classroomId'] ?? '';
+    uncontroller.task_id.value = taskId;
+    chcontroller.task_id.value = taskId;
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
@@ -55,126 +57,230 @@ class StudentsOfTask extends StatelessWidget {
         ),
       ),
       backgroundColor: backgroundColor,
-      body: Column(children: [
-        SizedBox(
-          height: 24.h,
+      body: FutureBuilder(
+        future: Future.wait<dynamic>(<Future<dynamic>>[
+          uncontroller.getUnCheckedStudentsOftask(),
+          chcontroller.getCheckedStudentsOfTask(),
+          TaskServices().getNotUploadedStudents(taskId, classroomId),
+        ]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final notUploaded =
+              (snap.data?[2] as List<Map<String, dynamic>>?) ?? [];
+          final submittedCount =
+              uncontroller.studentsTaskList.value.length +
+                  chcontroller.studentList.value.length;
+          final notSubmittedCount = notUploaded.length;
+          return Column(children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _StatChip(
+                    label: 'Submitted',
+                    count: submittedCount,
+                    color: Colors.green,
+                  ),
+                  _StatChip(
+                    label: 'Not Submitted',
+                    count: notSubmittedCount,
+                    color: Colors.redAccent,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                children: [
+                  _SectionHeader(
+                      title: 'Submitted — Pending Grade', color: Colors.orange),
+                  if (uncontroller.studentsTaskList.value.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: Text('None')),
+                    ),
+                  ...List.generate(
+                      uncontroller.studentsTaskList.value.length, (index) {
+                    return StudenOfTaskCard(
+                      studentName:
+                          uncontroller.studentsTaskList.value[index].name,
+                      uploadDate: DateFormat("yyyy/MM/dd").format(
+                          uncontroller.studentsTaskList.value[index].uploadeDate),
+                      taskId:
+                          uncontroller.studentsTaskList.value[index].task_id,
+                      taskUrl:
+                          uncontroller.studentsTaskList.value[index].taskUrl,
+                      photoUrl:
+                          uncontroller.studentsTaskList.value[index].photoUrl,
+                      index: index,
+                      task_result_id:
+                          uncontroller.studentsTaskList.value[index].id,
+                    );
+                  }),
+                  _SectionHeader(title: 'Graded', color: Colors.green),
+                  if (chcontroller.studentList.value.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: Text('None')),
+                    ),
+                  ...List.generate(chcontroller.studentList.value.length,
+                      (index) {
+                    return CheckedStudentsOfTaskCard(
+                      name: chcontroller.studentList.value[index].name,
+                      uploadeDate: DateFormat("yyyy/MM/dd").format(
+                          chcontroller.studentList.value[index].uploadeDate),
+                      mark: chcontroller.studentList.value[index].mark,
+                      photoUrl:
+                          chcontroller.studentList.value[index].photoUrl,
+                      id: chcontroller.studentList.value[index].id,
+                      taskUrl:
+                          chcontroller.studentList.value[index].taskUrl,
+                      task_id:
+                          chcontroller.studentList.value[index].task_id,
+                      class_id:
+                          chcontroller.studentList.value[index].class_id,
+                      student_id:
+                          chcontroller.studentList.value[index].student_id,
+                    );
+                  }),
+                  _SectionHeader(
+                      title: 'Not Submitted', color: Colors.redAccent),
+                  if (notUploaded.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: Text('All students submitted!')),
+                    ),
+                  ...notUploaded.map((s) => _NotSubmittedCard(
+                        name: s['name'] ?? '',
+                        photoUrl: s['photoUrl'] ?? '',
+                      )),
+                ],
+              ),
+            ),
+          ]);
+        },
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+  const _StatChip(
+      {required this.label, required this.count, required this.color});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$count',
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+                fontFamily: RedHatDisplay.bold),
+          ),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 13,
+                  color: color,
+                  fontFamily: RedHatDisplay.medium)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final Color color;
+  const _SectionHeader({required this.title, required this.color});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      color: color.withOpacity(0.08),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: color,
+          fontSize: 14,
+          fontFamily: RedHatDisplay.bold,
+          fontWeight: FontWeight.bold,
         ),
-        GestureDetector(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Fillter',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontFamily: RedHatDisplay.medium,
-                  fontSize: 16,
+      ),
+    );
+  }
+}
+
+class _NotSubmittedCard extends StatelessWidget {
+  final String name;
+  final String photoUrl;
+
+  const _NotSubmittedCard({required this.name, required this.photoUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundColor: Colors.grey.shade300,
+              backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+              child: photoUrl.isEmpty
+                  ? const Icon(Icons.person, color: Colors.grey)
+                  : null,
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontFamily: RedHatDisplay.regular,
+                  color: Colors.black87,
                 ),
               ),
-              SizedBox(
-                width: 7.w,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(8),
               ),
-              const Icon(
-                Icons.arrow_drop_down,
-                size: 15,
-                color: primaryColor,
+              child: const Text(
+                'Not submitted',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 12,
+                  fontFamily: RedHatDisplay.medium,
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        SizedBox(
-          height: 370.h,
-          width: double.infinity,
-          child: FutureBuilder(
-            future: uncontroller.getUnCheckedStudentsOftask(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return LoadingCircle();
-              } else {
-                return GetBuilder(
-                  init: StudentTaskInfoController(),
-                  builder: ((controller) {
-                    return ListView.builder(
-                      itemCount: uncontroller.studentsTaskList.value.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return StudenOfTaskCard(
-                          studentName:
-                              uncontroller.studentsTaskList.value[index].name,
-                          uploadDate: DateFormat("yyyy/MM/dd").format(
-                              uncontroller
-                                  .studentsTaskList.value[index].uploadeDate),
-                          taskId: uncontroller
-                              .studentsTaskList.value[index].task_id,
-                          taskUrl: uncontroller
-                              .studentsTaskList.value[index].taskUrl,
-                          photoUrl: uncontroller
-                              .studentsTaskList.value[index].photoUrl,
-                          index: index,
-                          task_result_id:
-                              uncontroller.studentsTaskList.value[index].id,
-                        );
-                      },
-                    );
-                  }),
-                );
-              }
-            },
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            left: 24.w,
-            right: 24.w,
-            top: 10.h,
-            bottom: 10.h,
-          ),
-          child: Divider(
-            color: gray,
-            thickness: 2,
-          ),
-        ),
-        SizedBox(
-          height: 340.h,
-          width: double.infinity,
-          child: FutureBuilder(
-            future: chcontroller.getCheckedStudentsOfTask(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return LoadingCircle();
-              } else {
-                return GetBuilder(
-                  init: CheckedStudentTaskInfoController(),
-                  builder: ((controller) {
-                    return ListView.builder(
-                      itemCount: chcontroller.studentList.value.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return CheckedStudentsOfTaskCard(
-                          name: chcontroller.studentList.value[index].name,
-                          uploadeDate: DateFormat("yyyy/MM/dd").format(
-                              chcontroller
-                                  .studentList.value[index].uploadeDate),
-                          mark: chcontroller.studentList.value[index].mark,
-                          photoUrl:
-                              chcontroller.studentList.value[index].photoUrl,
-                          id: chcontroller.studentList.value[index].id,
-                          taskUrl:
-                              chcontroller.studentList.value[index].taskUrl,
-                          task_id:
-                              chcontroller.studentList.value[index].task_id,
-                          class_id:
-                              chcontroller.studentList.value[index].class_id,
-                          student_id:
-                              chcontroller.studentList.value[index].student_id,
-                        );
-                      },
-                    );
-                  }),
-                );
-              }
-            },
-          ),
-        ),
-      ]),
+      ),
     );
   }
 }
@@ -208,144 +314,68 @@ class CheckedStudentsOfTaskCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         var data = Get.parameters;
-        print(taskUrl);
-
-        print(name + ' soultion for ' + data['taskName']);
         await openFile(
-            url: taskUrl, fileName: name + ' soultion for ' + data['taskName']);
+          url: taskUrl,
+          fileName: '$name solution for ${data['taskName']}',
+        );
       },
-      child: Column(
-        children: [
-          SizedBox(
-            height: 100.h,
-            width: double.infinity,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: 24.w,
-                right: 24.w,
-              ),
-              child: SizedBox(
-                height: 80.h,
-                width: double.infinity,
-                child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext) {
-                              return AlertDialog(
-                                contentPadding: EdgeInsets.all(0),
-                                /* actions: [
-                              Text('hi'),
-                            ],*/
-                                content: SizedBox(
-                                  height: 300.h,
-                                  width: 248.w,
-                                  child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Center(
-                                          child: SizedBox(
-                                            height: 250.h,
-                                            width: 284.w,
-                                            child: CircleAvatar(
-                                              radius: 80,
-                                              backgroundImage: NetworkImage(
-                                                  photoUrl.toString()),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          height: 39.h,
-                                          color: primaryColor,
-                                        ),
-                                      ]),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(photoUrl.toString()),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15.w,
-                      ),
-                      SizedBox(
-                        height: 70.h,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 100.w,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  '${name}',
-                                  style: const TextStyle(
-                                    color: primaryColor,
-                                    fontFamily: RedHatDisplay.regular,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10.h,
-                            ),
-                            SizedBox(
-                              width: 100.w,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  '$uploadeDate',
-                                  style: const TextStyle(
-                                    color: primaryColor,
-                                    fontFamily: RedHatDisplay.medium,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 140.5.h,
-                      ),
-                      SizedBox(
-                        height: 100.h,
-                        width: 50.w,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            '$mark',
-                            style: const TextStyle(
-                                color: primaryColor,
-                                fontFamily: RedHatDisplay.medium,
-                                fontSize: 20),
-                          ),
-                        ),
-                      ),
-                    ]),
-              ),
-            ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(14),
           ),
-          SizedBox(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(left: 50.w, right: 50.w),
-                child: const Divider(color: gray),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: NetworkImage(photoUrl.toString()),
               ),
-            ),
-          )
-        ],
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$name',
+                      style: const TextStyle(
+                        color: primaryColor,
+                        fontFamily: RedHatDisplay.regular,
+                        fontSize: 15,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '$uploadeDate',
+                      style: const TextStyle(
+                        color: gray,
+                        fontFamily: RedHatDisplay.medium,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$mark',
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontFamily: RedHatDisplay.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -370,271 +400,127 @@ class StudenOfTaskCard extends StatelessWidget {
   final taskId;
   final index;
   final task_result_id;
-  var uncontroller = Get.find<StudentTaskInfoController>();
+  final StudentTaskInfoController uncontroller =
+      Get.find<StudentTaskInfoController>();
+
   @override
   Widget build(BuildContext context) {
     uncontroller.task_id.value = taskId.toString();
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
       child: GestureDetector(
         onTap: () async {
           var data = Get.parameters;
-          print(taskUrl);
-
-          print(studentName + ' soultion for ' + data['taskName']);
           await openFile(
-              url: taskUrl,
-              fileName: studentName + ' soultion for ' + data['taskName']);
+            url: taskUrl,
+            fileName: '$studentName solution for ${data['taskName']}',
+          );
         },
         child: Container(
-          height: 130.h,
-          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
           decoration: BoxDecoration(
             color: white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(14),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              SizedBox(
-                height: 100.h,
-                width: double.infinity,
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 24.w,
-                      right: 24.w,
-                    ),
-                    child: SizedBox(
-                      height: 130.h,
-                      width: double.infinity,
-                      child: Center(
-                        child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext) {
-                                      return AlertDialog(
-                                          contentPadding: EdgeInsets.all(0),
-                                          /* actions: [
-                                      Text('hi'),
-                                    ],*/
-                                          content: SizedBox(
-                                            height: 350.h,
-                                            child: Stack(children: [
-                                              Align(
-                                                alignment: Alignment.topCenter,
-                                                child: Container(
-                                                  height: 350.h,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    image: DecorationImage(
-                                                      fit: BoxFit.fill,
-                                                      image: NetworkImage(
-                                                        photoUrl.toString(),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.bottomCenter,
-                                                child: Container(
-                                                  height: 60.h,
-                                                  decoration: BoxDecoration(
-                                                    color: primaryColor,
-                                                    borderRadius:
-                                                        BorderRadius.only(
-                                                      topLeft:
-                                                          Radius.circular(10),
-                                                      topRight:
-                                                          Radius.circular(10),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                          ));
-                                    },
-                                  );
-                                },
-                                child: CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage:
-                                      NetworkImage(photoUrl.toString()),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 30.w,
-                              ),
-                              SizedBox(
-                                width: 100.w,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: SizedBox(
-                                          child: Text(
-                                            '${studentName}',
-                                            style: TextStyle(
-                                                color: darkGray,
-                                                fontFamily:
-                                                    RedHatDisplay.regular,
-                                                fontSize: 16),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10.h,
-                                      ),
-                                      SizedBox(
-                                        child: FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          child: Text(
-                                            '$uploadDate',
-                                            style: TextStyle(
-                                                color: gray,
-                                                fontFamily:
-                                                    RedHatDisplay.medium,
-                                                fontSize: 12),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 100.5.h,
-                              ),
-                              SizedBox(
-                                height: 100.h,
-                                width: 65.w,
-                                child: MaterialButton(
-                                  padding: EdgeInsets.all(0),
-                                  onPressed: () {
-                                    Get.defaultDialog(
-                                      title: 'Add mark for a task',
-                                      titleStyle: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 20,
-                                        fontFamily: RedHatDisplay.medium,
-                                      ),
-                                      confirm: RaisedButton(
-                                        onPressed: () async {
-                                          print('is pressd');
-                                          uncontroller.indexForStd.value =
-                                              index;
-                                          uncontroller.task_result_id.value =
-                                              task_result_id;
-                                          EasyLoading.show();
-                                          await uncontroller.addMarkForTask();
-                                          Get.back();
-                                          EasyLoading.showSuccess('Done');
-                                        },
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(80.0)),
-                                        padding: EdgeInsets.all(0.0),
-                                        child: Ink(
-                                          decoration: BoxDecoration(
-                                              gradient: gradientColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0)),
-                                          child: Container(
-                                            constraints: BoxConstraints(
-                                                maxWidth: 250.0,
-                                                minHeight: 50.0),
-                                            alignment: Alignment.center,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "Add Mark",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15),
-                                                  ),
-                                                  Icon(Icons.add, color: white),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      onConfirm: () {},
-                                      content: Column(
-                                        children: [
-                                          Text(
-                                            '${studentName}',
-                                            style: TextStyle(
-                                              color: black,
-                                              fontSize: 15,
-                                              fontFamily: RedHatDisplay.bold,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: 15.h,
-                                          ),
-                                          TextField(
-                                            onChanged: (String value) {
-                                              uncontroller.newMark.value =
-                                                  value;
-                                            },
-                                            decoration: InputDecoration(
-                                              label: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Text('Enter mark'),
-                                              ),
-                                              labelStyle: TextStyle(
-                                                color: primaryColor,
-                                                fontSize: 15,
-                                              ),
-                                              fillColor: backgroundColor,
-                                              filled: true,
-                                              border: new OutlineInputBorder(
-                                                  borderRadius:
-                                                      new BorderRadius.circular(
-                                                          12.0),
-                                                  borderSide: new BorderSide(
-                                                      width: 0.0,
-                                                      color: backgroundColor)),
-                                              contentPadding:
-                                                  EdgeInsets.all(8.0),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.add,
-                                      color: primaryColor,
-                                      size: 40,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ]),
+              CircleAvatar(
+                radius: 24,
+                backgroundImage: NetworkImage(photoUrl.toString()),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$studentName',
+                      style: const TextStyle(
+                        color: darkGray,
+                        fontFamily: RedHatDisplay.regular,
+                        fontSize: 15,
                       ),
                     ),
-                  ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      '$uploadDate',
+                      style: const TextStyle(
+                        color: gray,
+                        fontFamily: RedHatDisplay.medium,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Get.defaultDialog(
+                    title: 'Add mark for a task',
+                    titleStyle: const TextStyle(
+                      color: primaryColor,
+                      fontSize: 20,
+                      fontFamily: RedHatDisplay.medium,
+                    ),
+                    content: Column(
+                      children: [
+                        Text(
+                          '$studentName',
+                          style: const TextStyle(
+                            color: black,
+                            fontSize: 15,
+                            fontFamily: RedHatDisplay.bold,
+                          ),
+                        ),
+                        SizedBox(height: 15.h),
+                        TextField(
+                          onChanged: (String value) {
+                            uncontroller.newMark.value = value;
+                          },
+                          decoration: InputDecoration(
+                            label: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Enter mark'),
+                            ),
+                            labelStyle: const TextStyle(
+                              color: primaryColor,
+                              fontSize: 15,
+                            ),
+                            fillColor: backgroundColor,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                width: 0.0,
+                                color: backgroundColor,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.all(8.0),
+                          ),
+                        ),
+                      ],
+                    ),
+                    confirm: ElevatedButton(
+                      onPressed: () async {
+                        uncontroller.indexForStd.value = index;
+                        uncontroller.task_result_id.value = task_result_id;
+                        EasyLoading.show();
+                        await uncontroller.addMarkForTask();
+                        Get.back();
+                        EasyLoading.showSuccess('Done');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: white,
+                      ),
+                      child: const Text('Add Mark'),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.add_circle,
+                  color: primaryColor,
+                  size: 34,
                 ),
               ),
             ],
@@ -646,31 +532,30 @@ class StudenOfTaskCard extends StatelessWidget {
 }
 
 Future openFile({required String url, String? fileName}) async {
-  final file = await downloadFile(url, fileName!);
+  final file = await downloadFile(url, fileName ?? 'file');
   if (file == null) return;
-  print('Path: ${file.path}');
-  // uncontroller.showNotification(fileName, file.path);
   OpenFile.open(file.path);
 }
 
 Future<File?> downloadFile(String url, String name) async {
   final appStorage = await getApplicationDocumentsDirectory();
   final file = File('/${appStorage.path}/$name');
-  var dest = '/storage/emulated/0/School mate files/$name';
+  final dest = '/storage/emulated/0/School mate files/$name';
+
   try {
-    final response = await Dio().download(
+    await Dio().download(
       url,
       dest,
       options: Options(
         responseType: ResponseType.plain,
         followRedirects: false,
-        receiveTimeout: 0,
+        receiveTimeout: Duration.zero,
       ),
     );
 
-    final raf = file.openSync(mode: FileMode.write);
-    raf.writeFromSync(response.data);
-    await raf.close();
+    if (await File(dest).exists()) {
+      return File(dest);
+    }
 
     return file;
   } catch (e) {

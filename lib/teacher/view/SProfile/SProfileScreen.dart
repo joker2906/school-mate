@@ -358,7 +358,7 @@ class SProfileScreen extends StatelessWidget {
                                 alignment: Alignment.centerRight,
                                 height: 50.0,
                                 margin: EdgeInsets.all(10),
-                                child: RaisedButton(
+                                child: ElevatedButton(
                                   onPressed: () {
                                     Get.defaultDialog(
                                       textConfirm: 'Add',
@@ -535,10 +535,12 @@ class SProfileScreen extends StatelessWidget {
                                       ),
                                     );
                                   },
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(80.0)),
-                                  padding: EdgeInsets.all(0.0),
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(80.0)),
+                                    padding: EdgeInsets.all(0.0),
+                                  ),
                                   child: Ink(
                                     decoration: BoxDecoration(
                                         gradient: gradientColor,

@@ -4,6 +4,27 @@ import 'package:school_management_system/public/config/user_information.dart';
 import 'package:school_management_system/student/models/Announcements/AnnouncementsModel.dart';
 
 class AnnouncementsServeces {
+  String _resolveStudentClassroom(Map<String, dynamic>? data) {
+    if (data == null) {
+      return UserInformation.classid.toString();
+    }
+
+    final directClassId = data['class_id'];
+    if (directClassId != null && directClassId.toString().isNotEmpty) {
+      return directClassId.toString();
+    }
+
+    final classValue = data['class'];
+    if (classValue is String && classValue.isNotEmpty) {
+      return classValue;
+    }
+    if (classValue is Map && classValue['id'] != null) {
+      return classValue['id'].toString();
+    }
+
+    return UserInformation.classid.toString();
+  }
+
   getUserClassroom() async {
     var userId = UserInformation.User_uId;
     String userclassroomId = '';
@@ -13,7 +34,7 @@ class AnnouncementsServeces {
         .get()
         .then((value) {
       if (value.data() != null) {
-        userclassroomId = value.data()!["class"].id;
+        userclassroomId = _resolveStudentClassroom(value.data());
       }
       print('Serverss');
       print(userclassroomId);

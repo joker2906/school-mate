@@ -63,7 +63,14 @@ class QuizCard extends StatelessWidget {
         bottom: 18.h,
       ),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          Get.to(() => QuizzPage(
+                quizId: id.toString(),
+                name: name.toString(),
+                subject: s_name.toString(),
+                difficulty: def.toString(),
+              ));
+        },
         child: Container(
           width: 380.w,
           height: 140.h,
@@ -120,7 +127,7 @@ class QuizCard extends StatelessWidget {
                               bottom: 6.h,
                             ),
                             child: Text(
-                              'subject',
+                              '$s_name',
                               style: const TextStyle(
                                 fontFamily: RedHatDisplay.regular,
                                 color: gray,

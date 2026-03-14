@@ -82,17 +82,6 @@ class HomeStudent extends StatelessWidget {
                       : sfRegularStyle(fontSize: 10, color: gray),
                 ),
               ),
-              CustomNavigationBarItem(
-                icon: const Icon(
-                  Icons.message,
-                ),
-                title: Text(
-                  "Chats",
-                  style: c.currentIndex.value == 3
-                      ? sfRegularStyle(fontSize: 10, color: primaryColor)
-                      : sfRegularStyle(fontSize: 10, color: gray),
-                ),
-              ),
             ],
             currentIndex: c.currentIndex.value,
             onTap: (index) {

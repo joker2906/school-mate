@@ -89,10 +89,10 @@ class HomeBody extends StatelessWidget {
                   ),
                   CustomNavigationBarItem(
                     icon: const Icon(
-                      Icons.message,
+                      Icons.fact_check,
                     ),
                     title: Text(
-                      "Chats",
+                      "Attendance",
                       style: controller.currentIndex.value == 3
                           ? sfRegularStyle(fontSize: 10, color: primaryColor)
                           : sfRegularStyle(fontSize: 10, color: gray),

@@ -13,6 +13,8 @@ class StudentP {
   String? studentClass;
   String? studentClassref;
   String? fees;
+  String? fullfees;
+  String? paidfees;
   String? phone;
   bool exists;
   String? urlAvatar;
@@ -32,6 +34,8 @@ class StudentP {
     this.additional = '',
     this.studentClassref,
     this.fees,
+    this.fullfees,
+    this.paidfees,
     this.id,
     this.phone,
     this.exists=true,

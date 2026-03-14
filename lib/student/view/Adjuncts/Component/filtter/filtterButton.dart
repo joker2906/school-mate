@@ -168,7 +168,7 @@ class ApplyFiltterButton extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(36, 0, 36, 36),
       child: ElevatedButton(
-          style: ElevatedButton.styleFrom(primary: primaryColor),
+          style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
           onPressed: () {
             _controller.getFiltredData();
             Navigator.pop(context);

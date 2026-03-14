@@ -14,8 +14,13 @@ import 'package:school_management_system/student/controllers/home_controller.dar
 import 'package:school_management_system/student/controllers/lessonsController.dart';
 import 'package:school_management_system/student/controllers/subject/subjectController.dart';
 import 'package:school_management_system/student/models/programs/programModel.dart';
+import 'package:school_management_system/student/view/Attendance/student_attendance_screen.dart';
+import 'package:school_management_system/student/view/Adjuncts/adjuncts.dart';
+import 'package:school_management_system/student/view/Fees/student_fees_screen.dart';
 import 'package:school_management_system/student/view/Home/subjectCart.dart';
+import 'package:school_management_system/student/view/Profile/stprofile.dart';
 import 'package:school_management_system/student/view/Subjects/SubjectsScreen.dart';
+import 'package:school_management_system/student/view/TasksScreen/TasksPage.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
@@ -33,6 +38,36 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({
     Key? key,
   }) : super(key: key);
+
+  Widget _flowActionCard({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: primaryColor),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                style: sfMediumStyle(fontSize: 12, color: black),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +163,53 @@ class HomeScreen extends StatelessWidget {
                     );
             }),
           ),
+          const DividerParent(
+            text: 'Student Flow',
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            alignment: WrapAlignment.center,
+            children: [
+              _flowActionCard(
+                label: 'View Attendance',
+                icon: Icons.fact_check,
+                onTap: () {
+                  homeController.changePages(3);
+                },
+              ),
+              _flowActionCard(
+                label: 'View Homework',
+                icon: Icons.task,
+                onTap: () {
+                  homeController.changePages(1);
+                },
+              ),
+              _flowActionCard(
+                label: 'View Study Material',
+                icon: Icons.attachment,
+                onTap: () {
+                  homeController.changePages(2);
+                },
+              ),
+              _flowActionCard(
+                label: 'View Exam Results',
+                icon: Icons.assessment,
+                onTap: () {
+                  Get.to(() => StudentProfile());
+                },
+              ),
+              _flowActionCard(
+                label: 'View Fee Status',
+                icon: Icons.payments_outlined,
+                onTap: () {
+                  Get.to(() => const StudentFeesScreen());
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           DividerParent(
             text: "subjects",
           ),
@@ -329,7 +411,7 @@ class programCard extends StatelessWidget {
         options: Options(
           responseType: ResponseType.bytes,
           followRedirects: false,
-          receiveTimeout: 0,
+          receiveTimeout: Duration.zero,
         ),
       );
 

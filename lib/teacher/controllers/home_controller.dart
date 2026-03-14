@@ -4,8 +4,8 @@ import 'package:school_management_system/teacher/controllers/SubjectController/T
 import 'package:school_management_system/teacher/model/Home/classRoomModel.dart';
 import 'package:school_management_system/teacher/resources/TClassesService/TClassesServices.dart';
 import 'package:school_management_system/teacher/resources/program/Programapi.dart';
+import 'package:school_management_system/teacher/view/Attendance/teacher_attendance_screen.dart';
 import 'package:school_management_system/teacher/view/Adjuncts/TeacherAdjuncts.dart';
-import 'package:school_management_system/teacher/view/Chat/chats_page.dart';
 import 'package:school_management_system/teacher/view/Home/teacher_home.dart';
 import 'package:school_management_system/teacher/view/tasks/TeacherTasksPage.dart';
 
@@ -48,10 +48,10 @@ var myprograms = [].obs;
     HomeTeacher(),
     TeacherTasksPage(),
     TeacherAdjuncts(),
-    ChatsPage(),
+    TeacherAttendanceScreen(),
   ].obs;
 
-  var appBarTitles = ['Home', 'Tasks', 'Adjuncts', 'Chat'].obs;
+  var appBarTitles = ['Home', 'Tasks', 'Adjuncts', 'Attendance'].obs;
 
   changePages(int index) {
     currentIndex.value = index;

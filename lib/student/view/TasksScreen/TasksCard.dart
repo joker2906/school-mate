@@ -1,30 +1,16 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:school_management_system/public/utils/constant.dart';
-import 'package:school_management_system/student/resources/chat/chat_api.dart';
-import 'package:school_management_system/student/resources/task/task_api.dart';
-import 'package:school_management_system/teacher/view/tasks/index.dart';
-import '../../../public/utils/font_families.dart';
-import '../../../public/utils/font_style.dart';
-import '../../../public/utils/util.dart';
-import '../../../teacher/view/tasks/AddFiles/components/SelectFile.dart';
+import 'package:school_management_system/public/utils/font_families.dart';
+import 'package:school_management_system/public/utils/util.dart';
+import 'package:school_management_system/teacher/view/tasks/AddFiles/components/SelectFile.dart';
 import '../../controllers/TasksController.dart';
-import 'dart:io';
-import 'package:path/path.dart';
 
-File? file;
 var _controller = Get.put<TasksController>(TasksController());
-var tasks = _controller.tasks;
-var re = taskServices();
-UploadTask? task;
 
 class TasksCard extends StatelessWidget {
   const TasksCard({
@@ -43,290 +29,241 @@ class TasksCard extends StatelessWidget {
   final deadline;
   final task_id;
   final url;
-  @override
-  void initState() {
-    print('Helooooooooooooooooooo');
+
+  void _showTaskOptions(BuildContext context) {
+    _controller.task_id.value = task_id;
+    _controller.task_name.value = name;
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 32.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              '$name',
+              style: const TextStyle(
+                fontSize: 18,
+                fontFamily: RedHatDisplay.bold,
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '$subjectName',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+                fontFamily: RedHatDisplay.regular,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  padding: EdgeInsets.symmetric(vertical: 14.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.download, color: Colors.white),
+                label: const Text(
+                  'Download Homework',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                onPressed: () async {
+                  Get.back();
+                  showSnackBar('Starting download...', context);
+                  final dir = await getExternalStorageDirectory();
+                  await FlutterDownloader.enqueue(
+                    url: '$url',
+                    savedDir: dir!.path,
+                    fileName: '$name',
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 12.h),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green.shade600,
+                  padding: EdgeInsets.symmetric(vertical: 14.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.upload_file, color: Colors.white),
+                label: const Text(
+                  'Upload Solution',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                onPressed: () async {
+                  Get.back();
+                  await showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => _UploadDialog(controller: _controller),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final fileName = file != null ? basename(file!.path) : 'no file';
-    _controller.task_id.value = task_id;
-    _controller.task_name.value = name;
-    print("kkkkkkkkkkkkkkkkkkkkkkk");
-    return Container(
-        width: 200.w,
-        child: GetBuilder(
-          init: TasksController(),
-          builder: ((controller) {
-            return Stack(
+    return GestureDetector(
+      onTap: () => _showTaskOptions(context),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradientColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.all(14.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 15.w,
-                      top: 24.h,
-                      bottom: 2.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 70.w,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              '${subjectName}',
-                              textAlign: TextAlign.start,
-                              style: redHatBoldStyle(
-                                  fontSize: 24, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 70.w,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text('$name',
-                                textAlign: TextAlign.start,
-                                style: redHatLightStyle(
-                                  fontSize: 12,
-                                  color: Colors.white,
-                                )),
-                          ),
-                        )
-                      ],
-                    ),
+                Text(
+                  '$subjectName',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontFamily: RedHatDisplay.bold,
+                    fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: 15.h,
-                    ),
-                    child: SizedBox(
-                      height: 30.h,
-                      child: DropdownButton(
-                        underline: Text(''),
-                        borderRadius: BorderRadius.circular(10),
-                        icon: const Icon(
-                          Icons.menu,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                        items: [
-                          DropdownMenuItem(
-                            value: 'Donwload task',
-                            onTap: () async {
-                              print("downloadddddddd");
-                              showSnackBar('Starting download...', context);
-                              /*openFile(
-                      url: '${gProgram.url}',
-                      fileName: '${gProgram.type}',
-                      );*/
-                              /*try{ final taskId = await FlutterDownloader.enqueue(
-                      url: '${widget.gProgram.url}',
-                      savedDir:
-                          '/data/user/0/com.example.school_management_system/files/',
-                      showNotification:
-                          true, // show download progress in status bar (for Android)
-                      openFileFromNotification:
-                          true, // click on notification to open downloaded file (for Android)
-                      );
-                     }catch(e){
-                      print(e);
-                     }*/
-
-                              final baseStorage =
-                                  await getExternalStorageDirectory();
-                              final id = await FlutterDownloader.enqueue(
-                                url: '${url}',
-                                savedDir: baseStorage!.path,
-                                fileName: '$name',
-                              );
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Download Task'),
-                                SizedBox(
-                                  width: 4.w,
-                                ),
-                                Icon(
-                                  Icons.file_download,
-                                  color: primaryColor,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            onTap: () async {
-                              await Get.dialog(Container(
-                                color: Colors.greenAccent,
-                              ));
-                              print('is Open');
-                              await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Upload task solution"),
-                                    content: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SizedBox(
-                                        height: 100.h,
-                                        width: 300.w,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GetBuilder(
-                                              init: TasksController(),
-                                              builder: (_) => SizedBox(
-                                                width: 150.w,
-                                                child: Text(
-                                                  "${_controller.file_name.value.toString()}",
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ),
-                                            MaterialButton(
-                                              padding: EdgeInsets.all(0),
-                                              child: Icon(Icons.attach_file),
-                                              onPressed: () async {
-                                                var file = await selectfile();
-                                                _controller.updateFile(file);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    actions: [
-                                      FlatButton(
-                                        child: Text(
-                                          "Dismiss",
-                                          style: TextStyle(
-                                            color: black,
-                                            fontSize: 16,
-                                            fontFamily: RedHatDisplay.medium,
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      FlatButton(
-                                        color: Colors.redAccent,
-                                        child: Text("Upload",
-                                            style: TextStyle(
-                                              color: white,
-                                              fontSize: 18,
-                                              fontFamily: RedHatDisplay.medium,
-                                            )),
-                                        onPressed: () async {
-                                          EasyLoading.show();
-                                          await _controller.uploadTaskResult();
-                                          Navigator.of(context).pop();
-                                          EasyLoading.showSuccess('Done');
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            value: 'Upload solution',
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Upload solution'),
-                                SizedBox(
-                                  width: 4.w,
-                                ),
-                                Icon(
-                                  Icons.upload_file,
-                                  color: primaryColor,
-                                  size: 15,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {},
-                      ),
-                    ),
+                SizedBox(height: 4.h),
+                Text(
+                  '$name',
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontFamily: RedHatDisplay.regular,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      left: 95.w,
-                      top: 124.h,
-                      right: 10.w,
-                      bottom: 16.h.h,
-                    ),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 35.h),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 70.w,
-                              height: 13.h,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.arrow_drop_up,
-                                    size: 15.h,
-                                    color: Colors.white,
-                                  ),
-                                  Text(
-                                    '$uploadDate',
-                                    style: redHatRegularStyle(
-                                      fontSize: 12.h,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 12.h,
-                            ),
-                            Container(
-                              width: 70.w,
-                              height: 13.h,
-                              child: Row(children: [
-                                Icon(
-                                  Icons.arrow_drop_down,
-                                  size: 15.h,
-                                  color: Colors.white,
-                                ),
-                                Text(
-                                  '$deadline',
-                                  style: redHatRegularStyle(
-                                    fontSize: 12.h,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ]),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                )
               ],
-            );
-          }),
-        ));
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.arrow_drop_up,
+                        size: 14, color: Colors.white),
+                    Expanded(
+                      child: Text(
+                        '$uploadDate',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 11),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.arrow_drop_down,
+                        size: 14, color: Colors.white),
+                    Expanded(
+                      child: Text(
+                        '$deadline',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 11),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UploadDialog extends StatelessWidget {
+  final TasksController controller;
+  const _UploadDialog({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Upload Task Solution'),
+      content: GetBuilder<TasksController>(
+        init: controller,
+        builder: (_) => Row(
+          children: [
+            Expanded(
+              child: Text(
+                controller.file_name.value.toString().isNotEmpty
+                    ? controller.file_name.value.toString()
+                    : 'No file selected',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.attach_file, color: primaryColor),
+              onPressed: () async {
+                var f = await selectfile();
+                controller.updateFile(f);
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel',
+              style: TextStyle(color: Colors.black54)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+          onPressed: () async {
+            EasyLoading.show();
+            await controller.uploadTaskResult();
+            Navigator.of(context).pop();
+            EasyLoading.showSuccess('Done');
+          },
+          child: const Text('Upload',
+              style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    );
   }
 }

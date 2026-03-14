@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path/path.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
 
 class taskStorage {
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -12,10 +10,10 @@ class taskStorage {
 
   late File file;
   var task = ImagePicker();
- 
+
 
   Future<String> uploadTask() async {
-    var fileicked = await task.getImage(source: ImageSource.gallery);
+    var fileicked = await task.pickImage(source: ImageSource.gallery);
     if (fileicked != null) {
       file = File(fileicked.path);
       var imageName = basename(fileicked.path);

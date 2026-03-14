@@ -167,6 +167,22 @@ class _OtpState extends State<Otp> {
                           onPressed: () async {
                             if (UserInformation.teacherverifycode ==
                                 A + B + C + D) {
+                              final newteacher = {
+                                "uid": UserInformation.User_uId,
+                                "email": UserInformation.email,
+                                "first_name": UserInformation.first_name,
+                                "last_name": UserInformation.last_name,
+                                "phone": UserInformation.phone,
+                                "urlAvatar": UserInformation.urlAvatr,
+                                "token": UserInformation.Token,
+                                "date_left": Timestamp.now(),
+                                "date_start": Timestamp.now(),
+                                "subjects": [],
+                                "University": "nothing",
+                                "graduateYear": "nothing",
+                                "specializtion": "nothing",
+                                "study": "nothing",
+                              };
                               await _firestore
                                   .collection('teacher')
                                   .doc(UserInformation.User_uId)

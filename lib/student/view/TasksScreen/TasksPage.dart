@@ -73,23 +73,16 @@ class TasksPage extends StatelessWidget {
                                         crossAxisSpacing: 24.w,
                                         mainAxisSpacing: 24.w),
                                 itemBuilder: (BuildContext, index) {
-                                  return Container(
-                                    height: 178.h,
-                                    width: 178.w,
-                                    decoration: BoxDecoration(
-                                      gradient: gradientColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: TasksCard(
-                                      name: controller.tasks.value[index].name,
-                                      deadline: controller
-                                          .tasks.value[index].deadline,
-                                      subjectName: controller
-                                          .tasks.value[index].subjectName,
-                                      uploadDate: controller
-                                          .tasks.value[index].uploadDate,
-                                      task_id: controller.tasks.value[index].id,
-                                    ),
+                                  return TasksCard(
+                                    name: controller.tasks.value[index].name,
+                                    deadline: controller
+                                        .tasks.value[index].deadline,
+                                    subjectName: controller
+                                        .tasks.value[index].subjectName,
+                                    uploadDate: controller
+                                        .tasks.value[index].uploadDate,
+                                    task_id: controller.tasks.value[index].id,
+                                    url: controller.tasks.value[index].url,
                                   );
                                 });
                           }),

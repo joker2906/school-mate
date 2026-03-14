@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:school_management_system/admin/view/admin_home.dart';
 import 'package:school_management_system/public/login/verify_code_parent.dart';
 import 'package:school_management_system/public/splash/splash_scrren.dart';
 import 'package:school_management_system/student/binding/announcements.dart';
@@ -43,6 +44,7 @@ class AppPages {
   static const Verifycode = '/verify';
   static const VerifyCodeparent = '/verifyparent';
   static const Parenthome = '/parhome';
+  static const adminhome = '/adminhome';
   static const tasks = '/tasks';
   static const adjuncts = '/adjuncts';
   static const announcements = '/announcements';
@@ -84,6 +86,10 @@ class AppPages {
     GetPage(
       name: Parenthome,
       page: () => HomeParent(),
+    ),
+    GetPage(
+      name: adminhome,
+      page: () => const AdminHome(),
     ),
     GetPage(
       name: tasks,

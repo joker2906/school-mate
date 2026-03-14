@@ -83,13 +83,49 @@ class TreferenceBottomsheetController extends GetxController {
     update();
   }
 
+  ////////////////Quiz/////////
+  var quiz_name = ''.obs;
+  var quiz_question = ''.obs;
+  var quiz_answer = ''.obs;
+  var quiz_difficulty = 'Easy'.obs;
+
+  updateQuizDifficulty(String value) {
+    quiz_difficulty.value = value;
+    update();
+  }
+
+  addQuiz() async {
+    if (subjectList.value.isEmpty || gradeList.value.isEmpty) {
+      return;
+    }
+
+    var index = subjectList.value
+        .indexWhere((element) => element.subjectName == selectedSuject.value);
+    if (index < 0) {
+      return;
+    }
+
+    await refServices.addQuiz(
+      grade: int.parse(gradeList.value[currentGrade.value].toString()),
+      name: quiz_name.value,
+      subjectName: selectedSuject.value,
+      subjectId: subjectList[index].subjectId.toString(),
+      difficulty: quiz_difficulty.value,
+      question: quiz_question.value,
+      answer: quiz_answer.value,
+    );
+    update();
+  }
+
   @override
   void onInit() async {
     // TODO: implement onInit
     super.onInit();
     print(TeacherSubjects.subjectsList);
     subjectList.value = TeacherSubjects.subjectsList;
-    selectedSuject.value = subjectList.value[0].subjectName;
     gradeList.value = await refServices.getAllGrade();
+    if (subjectList.value.isNotEmpty) {
+      selectedSuject.value = subjectList.value[0].subjectName;
+    }
   }
 }
